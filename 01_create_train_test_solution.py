@@ -7,20 +7,20 @@
 get_ipython().system('ls')
 
 
-# In[6]:
+# In[170]:
 
 
 import pandas as pd
 import numpy as np
 
 
-# In[7]:
+# In[171]:
 
 
 pd.options.display.max_columns=100
 
 
-# In[8]:
+# In[172]:
 
 
 get_ipython().run_line_magic('time', 'train = pd.read_csv("train_ver2.csv")')
@@ -28,37 +28,37 @@ display(train.head())
 display(train.shape)
 
 
-# In[13]:
+# In[173]:
 
 
 train.describe()
 
 
-# In[112]:
+# In[174]:
 
 
 train.groupby("ncodpers").ind_nuevo.count().mean()
 
 
-# In[113]:
+# In[162]:
 
 
 get_ipython().run_line_magic('time', 'test = pd.read_csv("test_ver2.csv")')
 
 
-# In[114]:
+# In[163]:
 
 
 test.shape
 
 
-# In[115]:
+# In[164]:
 
 
 test.groupby("ncodpers").ind_nuevo.count().mean()
 
 
-# In[120]:
+# In[165]:
 
 
 train.groupby("ncodpers").fecha_dato.max().head()
@@ -69,6 +69,57 @@ train.groupby("ncodpers").fecha_dato.max().head()
 
 test.groupby("ncodpers").fecha_dato.max().head()
 
+
+# In[127]:
+
+
+train.columns
+
+
+# In[128]:
+
+
+test.columns
+
+
+# In[166]:
+
+
+train_uid = set(train.ncodpers.unique())
+len(train_uid)
+
+
+# In[167]:
+
+
+test_uid = set(test.ncodpers.unique())
+len(test_uid)
+
+
+# In[168]:
+
+
+len(train_uid.intersection(test_uid))
+
+
+# In[169]:
+
+
+test_uid.issubset(train_uid)
+
+
+# So, in conclusion:
+# 
+#     - train set has ind_xxx_fin_ult1 target columsn , test set does not
+#     - tarin has on avg 14 months of history
+#     - test set only has last month for each user, 2016-06-28
+#     - uids of test set are subset of uids of train set
+#     - instead of plitting by uids, as below, we should split by months. 
+#     - The first n months should be for train and feature building.
+#     - The last month n+1 (i.e. all uids therein)are the test set to predict the product bought in the last month. 
+#     
+
+# ## Train Set Split by uid
 
 # In[14]:
 
@@ -274,18 +325,19 @@ i=0
 display(search_target(train, uids[i]))
 
 
-# In[47]:
+# In[124]:
 
 
 dfi=train[train.ncodpers==uids[i]].sort_values("fecha_dato",  ascending=True)
+dfi.index = dfi.fecha_dato
 dfi[target_cols].diff(axis=0)
 
 
-# In[49]:
+# In[126]:
 
 
 dfid = dfi[target_cols].diff(axis=0)
-dfid[dfid>0]
+dfid.iloc[-1,:]#[dfid>0]
 
 
 # In[76]:
@@ -365,10 +417,11 @@ train.shape
 train.head()
 
 
-# In[109]:
+# In[129]:
 
 
-train.to_csv("train_FR.csv.gz")
+#train.to_csv("train_FR.csv.gz")
+get_ipython().system('rm train_FR.csv.gz')
 
 
 # 2. test_private
@@ -391,7 +444,13 @@ test_private.groupby("ncodpers").fecha_dato.count().mean()
 test_private.groupby("ncodpers").fecha_dato.max().head()
 
 
-# So: next steps:
+# Done: 
+# 
+#     - split train / test set (private / public) 
+#     - created solution on test set (in principle) 
+# 
+# Next steps:
+# 
 #         - recreate target on last month only, 2016-05-28
 #         - remove last month 2016-05-28 from train set 
 #         - save train and test sets to csv
@@ -410,6 +469,92 @@ test_private.groupby("ncodpers").fecha_dato.max().head()
 #         - do a sandbox submission.
 #             
 #         
+
+# In[130]:
+
+
+display(train.shape)
+display(train.head())
+
+
+# In[135]:
+
+
+#train[train.fecha_dato<"2016-06-28"]
+train=train[train.fecha_dato<train.fecha_dato.max()]
+train.shape
+
+
+# In[136]:
+
+
+train.fecha_dato.max()
+
+
+# In[140]:
+
+
+test_private.shape
+
+
+# In[143]:
+
+
+test_fdm = test_private.fecha_dato.max()
+test_fdm
+
+
+# In[142]:
+
+
+test_private.fecha_dato.value_counts()
+
+
+# In[144]:
+
+
+test_public.fecha_dato.value_counts()
+
+
+# In[145]:
+
+
+test_private = test_private[test_private.fecha_dato==test_fdm]
+test_public = test_public[test_public.fecha_dato==test_fdm]
+
+
+# In[147]:
+
+
+display(test_private.fecha_dato.value_counts())
+display(test_public.fecha_dato.value_counts())
+
+
+# In[148]:
+
+
+display(test_private.ncodpers.nunique())
+display(test_public.ncodpers.nunique())
+
+
+# In[151]:
+
+
+# DSave to disk 
+get_ipython().run_line_magic('time', 'train.to_csv("train_fr.csv.gz")')
+
+
+# In[152]:
+
+
+test_private.head()
+
+
+# In[157]:
+
+
+test_private.loc[:,~test_private.columns.isin(target_cols)]
+
 
 # In[ ]:
 
