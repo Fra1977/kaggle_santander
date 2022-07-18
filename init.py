@@ -22,7 +22,7 @@ def search_target(df, uid):
     mn=dfi[target_cols].diff(axis=0).min(axis=0).min()
     return mn,mx
 
-def df2target(df,uid):
+def df2target(df,uid, data_max):
     """ 
     converts a competition data frame filteredd for a given uid into a target string 
     with the submissionformat:
