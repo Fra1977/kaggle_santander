@@ -22,7 +22,7 @@ def search_target(df, uid):
     mn=dfi[target_cols].diff(axis=0).min(axis=0).min()
     return mn,mx
 
-def df2target(df,uid, data_max):
+def df2target(df,uid):
     """ 
     converts a competition data frame filteredd for a given uid into a target string 
     with the submissionformat:
@@ -39,6 +39,7 @@ def df2target(df,uid, data_max):
     dfi=df[df.ncodpers==uid].sort_values("fecha_dato",  ascending=True)
     #dfi.sort("fecha_dato", inplace=True, ascending=True)
     dfid=dfi[target_cols].diff(axis=0)
+    dfid = dfid.iloc[-1:,:]#[dfid.fecha_dato==data_max]
     a=dfid[dfid >0].stack()#.index.tolist()
     a=a.reset_index()["level_1"].unique().tolist()
     a=",".join([str(uid),]+a)
