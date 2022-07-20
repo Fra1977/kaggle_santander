@@ -1,0 +1,9 @@
+def transform_dataset_train(df):
+    df['rowNB']  = df.groupby(['ncodpers'])['fecha_dato'].cumcount()+1
+    df = df.sort_values(['ncodpers','fecha_dato'])
+    df_aux = df.copy()
+    df_aux.columns = [str(col) + '_after' for col in df_aux.columns]
+    df2 = df.merge(df_aux, left_on=['ncodpers'], right_on=['ncodpers_after'],how='left')
+    df2['rowDif'] = df2.rowNB_after - df2.rowNB
+    df3 = df2[(df2.ncodpers == df2.ncodpers_after) & (df2.rowDif==1)]
+    return df3
