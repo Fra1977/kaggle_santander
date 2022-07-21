@@ -19,9 +19,10 @@ def transform_dataset_train(df,inputString, numberMonths):
     df_aux = df.copy()
     df_aux.columns = [str(col) + f"{inputString}"  for col in df_aux.columns]
     df2 = df.merge(df_aux, left_on=['ncodpers'], right_on=['ncodpers' + f"{inputString}"],how='left')
-    print(df2.columns)
-    column_name = 'rowNB' + f"{inputString}"
-    print(column_name)
-    df2['rowDif'] = df2.column_name- df2.rowNB
-    df3 = df2[(df2.ncodpers == df2.ncodpers_after) & (df2.rowDif==numberMonths)]
-    return df3
+#   print(df2.columns)    
+    df2['rowDif'] = df2['rowNB' + f"{inputString}"]- df2.rowNB
+    print(df2['ncodpers' + f"{inputString}"].head(1))
+    df3 = df2[(df2.ncodpers == (df2['ncodpers' + f"{inputString}"])) & (df2.rowDif==numberMonths)]
+    return df2
+
+df_train2 = transform_dataset_train(df,'_next',1)
