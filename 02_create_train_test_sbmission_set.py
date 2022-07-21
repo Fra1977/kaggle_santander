@@ -321,18 +321,26 @@ df_subm = df_subm[df_subm.ID.isin(train_uids_atmax)]
 df_subm
 
 
-# In[90]:
+# In[101]:
 
 
-df_subm.to_csv("submission.csv")
+df_subm.to_csv("submission.csv", index=False)
 
 
-# In[93]:
+# In[104]:
 
 
-sample = df_subm.sample(100)
+df_subm.iloc[:10]
+
+
+# In[106]:
+
+
+sample = df_subm.copy()
 sample.columns=["Id", "Predicted"]
-sample.to_csv("submission_sample_FR.csv")
+sample["Predicted"] = df_subm.Expected[6]
+display(sample.head(4))
+sample.to_csv("submission_sample_FR.csv", index=False)
 
 
 # In[ ]:
@@ -390,11 +398,7 @@ train_uids_atmax = train[train.fecha_dato==train.fecha_dato.max()].ncodpers.uniq
 
 # **run until here to create submission and sample files.**
 
-# In[ ]:
-
-
-
-
+# This file cretaes a first successful submission with MAP@1 score. 
 
 # In[ ]:
 
@@ -440,6 +444,13 @@ with open("test_public_data_soln.csv", "w") as f:
 
 with open("test_private_data_soln.csv", "w") as f:
           [f.write(i+"\n") for i in test_private_data]
+
+
+# In[157]:
+
+
+display(len(test_public_data))
+display(test_public_data[:20])
 
 
 # In[170]:
