@@ -11,18 +11,24 @@ def transform_dataset_train(df):
 
 
 
-### trying more generic function for more months
+### more generic function for more months
+### how it will work
+### everytime we want to generate the current position and next N position
+### we can say what are the number of months we want to go further in the n+x position in time
+### for instance if we are at 01-02-2016 and want to get data from March we will do (df,'_StringYouWant', 1)
+### if we want April we will have to do (df,'_StringYouWant', 2) etc
+### it only does one position at a time
+### if you want n, n+1,n+2 you will have to first run n+1 ( order doens't matter) and than n+2 (and merge the datasets afterowrds)
+### that's why it's possible to insert string for defing the columns that belong to each month
 
 def transform_dataset_train(df,inputString, numberMonths):
     df['rowNB']  = df.groupby(['ncodpers'])['fecha_dato'].cumcount()+1
     df = df.sort_values(['ncodpers','fecha_dato'])
     df_aux = df.copy()
     df_aux.columns = [str(col) + f"{inputString}"  for col in df_aux.columns]
-    df2 = df.merge(df_aux, left_on=['ncodpers'], right_on=['ncodpers' + f"{inputString}"],how='left')
-#   print(df2.columns)    
+    df2 = df.merge(df_aux, left_on=['ncodpers'], right_on=['ncodpers' + f"{inputString}"],how='left')    
     df2['rowDif'] = df2['rowNB' + f"{inputString}"]- df2.rowNB
-    print(df2['ncodpers' + f"{inputString}"].head(1))
     df3 = df2[(df2.ncodpers == (df2['ncodpers' + f"{inputString}"])) & (df2.rowDif==numberMonths)]
-    return df2
+    return df3
 
 df_train2 = transform_dataset_train(df,'_next',1)
