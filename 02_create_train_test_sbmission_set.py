@@ -398,7 +398,7 @@ train_uids_atmax = train[train.fecha_dato==train.fecha_dato.max()].ncodpers.uniq
 
 # **run until here to create submission and sample files.**
 
-# This file cretaes a first successful submission with MAP@1 score. 
+#     This file cretaes a first successful submission with MAP@1 score. 
 
 # In[ ]:
 
@@ -424,26 +424,63 @@ display(test_uid.issubset(train_uid))
 len(test_uid.intersection(train_uid))
 
 
-# In[ ]:
+# In[107]:
 
 
 test_final = train[train.fecha_dato==train_fdm].copy()
-#train = train[train.fecha_dato<train_fdm] #not yet!
-test_final = test_final[~target_cols]
 
 
-# In[164]:
+# In[110]:
 
 
-with open("test_public_data_soln.csv", "w") as f:
-          [f.write(i+"\n") for i in test_public_data]
+test_final.columns
 
 
-# In[165]:
+# In[112]:
 
 
-with open("test_private_data_soln.csv", "w") as f:
-          [f.write(i+"\n") for i in test_private_data]
+
+test_final =  test_final.drop(target_cols, axis=1)
+
+
+# In[114]:
+
+
+test_final = test_final[test_final.ncodpers.isin(df_subm.ID)]
+test_final.shape
+
+
+# In[118]:
+
+
+test_final.to_csv("test_final.csv")
+
+
+# In[116]:
+
+
+display(train.fecha_dato.max())
+train = train[train.fecha_dato<train_fdm] #not yet!
+display(train.fecha_dato.max())
+
+
+# In[120]:
+
+
+
+train.to_csv("train_final.csv")
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
 
 # In[157]:
