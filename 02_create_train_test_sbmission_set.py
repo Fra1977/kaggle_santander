@@ -13,7 +13,7 @@ from init import *
 pd.options.display.max_columns
 
 
-# In[3]:
+# In[121]:
 
 
 get_ipython().run_line_magic('time', 'train = pd.read_csv("train_ver2.csv")')
@@ -21,25 +21,25 @@ display(train.head())
 display(train.shape)
 
 
-# In[8]:
+# In[122]:
 
 
 train_uid = set(train.ncodpers.unique())
 
 
-# In[9]:
+# In[123]:
 
 
 len(train_uid)
 
 
-# In[10]:
+# In[124]:
 
 
 train.fecha_dato.value_counts()
 
 
-# In[11]:
+# In[125]:
 
 
 train_fdm = train.fecha_dato.max()
@@ -48,7 +48,7 @@ train_fdm
 
 # # Split Train / Test Set
 
-# In[12]:
+# In[126]:
 
 
 #!Not yet!!
@@ -56,14 +56,14 @@ train_fdm
 test=train #.copy()
 
 
-# In[13]:
+# In[127]:
 
 
 display(test.shape)
 display(test.fecha_dato.max())
 
 
-# In[ ]:
+# In[128]:
 
 
 display(train.shape)
@@ -75,7 +75,7 @@ display(train.fecha_dato.max())
 
 # # Modified find target: add last date
 
-# In[17]:
+# In[129]:
 
 
 def df2target(df,uid):
@@ -136,7 +136,7 @@ print(answer)
 get_ipython().run_cell_magic('time', '', 'test_public_data = []\nfor uid in list(test_public_uid):\n    test_public_data.append(df2target(test, uid))# , test.fecha_dato.max()))')
 
 
-# In[39]:
+# In[130]:
 
 
 test.sort_values(["ncodpers","fecha_dato"], ascending=True, inplace=True)
@@ -203,25 +203,25 @@ display(test.shape)
 display(test.ncodpers.nunique())
 
 
-# In[68]:
+# In[131]:
 
 
-test_uids = np.random.choice(test.ncodpers.unique(), size=10000, replace=False)
+test_uids = np.random.choice(test.ncodpers.unique(), size=100000, replace=False)
 
 
-# In[69]:
+# In[132]:
 
 
 len(np.unique(test_uids))
 
 
-# In[70]:
+# In[133]:
 
 
 np.sort(test_uids)[:10]
 
 
-# In[71]:
+# In[134]:
 
 
 test_public_data = None
@@ -230,31 +230,31 @@ import gc
 gc.collect()
 
 
-# In[72]:
+# In[135]:
 
 
 get_ipython().run_cell_magic('time', '', '\ntest2 = test[test.ncodpers.isin(test_uids)].copy()\ntest2.sort_values(["ncodpers","fecha_dato"], ascending=True, inplace=True)\ntest_data = []\nfor _, subsetDF in test2.groupby(\'ncodpers\'):\n    test_data.append([_,df2target_subset(subsetDF) ])\n    ')
 
 
-# In[73]:
+# In[136]:
 
 
 test2.ncodpers.nunique()
 
 
-# In[74]:
+# In[137]:
 
 
 len(test_data)
 
 
-# In[75]:
+# In[138]:
 
 
 test_data[:100]
 
 
-# In[77]:
+# In[139]:
 
 
 df_subm = pd.DataFrame(test_data, columns=["ID", "Expected"])
@@ -276,25 +276,25 @@ df_subm = pd.DataFrame(test_data, columns=["ID", "Expected"])
 #    - debug sandbox. Try MAP@1 only, remove index, add Usage column 
 #    - create larger >=100k solution and test file. 
 
-# In[78]:
+# In[140]:
 
 
 df_subm.head()
 
 
-# In[80]:
+# In[141]:
 
 
 df_subm.shape
 
 
-# In[85]:
+# In[142]:
 
 
 df_subm[df_subm.Expected!=""].shape
 
 
-# In[86]:
+# In[143]:
 
 
 311/10000
@@ -303,44 +303,44 @@ df_subm[df_subm.Expected!=""].shape
 # target rate = 311/10000 =  3%
 # 
 
-# In[79]:
+# In[144]:
 
 
 train_uids_atmax = train[train.fecha_dato==train.fecha_dato.max()].ncodpers.unique()
 
 
-# In[88]:
+# In[145]:
 
 
 df_subm = df_subm[df_subm.ID.isin(train_uids_atmax)]
 
 
-# In[89]:
+# In[146]:
 
 
 df_subm
 
 
-# In[101]:
+# In[147]:
 
 
-df_subm.to_csv("submission.csv", index=False)
+df_subm.to_csv("submission_100k.csv", index=False)
 
 
-# In[104]:
+# In[148]:
 
 
 df_subm.iloc[:10]
 
 
-# In[106]:
+# In[149]:
 
 
 sample = df_subm.copy()
 sample.columns=["Id", "Predicted"]
 sample["Predicted"] = df_subm.Expected[6]
 display(sample.head(4))
-sample.to_csv("submission_sample_FR.csv", index=False)
+sample.to_csv("submission_sample_FR_100k.csv", index=False)
 
 
 # In[ ]:
@@ -364,13 +364,13 @@ Team ToDO:
     - Day 26: competition
 
 
-# In[209]:
+# In[150]:
 
 
 train.ncodpers.nunique()
 
 
-# In[59]:
+# In[151]:
 
 
 train[train.fecha_dato==train.fecha_dato.max()].ncodpers.nunique()
@@ -408,7 +408,7 @@ train_uids_atmax = train[train.fecha_dato==train.fecha_dato.max()].ncodpers.uniq
 
 # ## check that all test UIDs are a subset of train UIDS
 
-# In[99]:
+# In[152]:
 
 
 train_uid = set(train.ncodpers.unique())
@@ -418,45 +418,45 @@ display(len(test_uid))
 display(test_uid.issubset(train_uid))
 
 
-# In[100]:
+# In[153]:
 
 
 len(test_uid.intersection(train_uid))
 
 
-# In[107]:
+# In[154]:
 
 
 test_final = train[train.fecha_dato==train_fdm].copy()
 
 
-# In[110]:
+# In[155]:
 
 
 test_final.columns
 
 
-# In[112]:
+# In[156]:
 
 
 
 test_final =  test_final.drop(target_cols, axis=1)
 
 
-# In[114]:
+# In[157]:
 
 
 test_final = test_final[test_final.ncodpers.isin(df_subm.ID)]
 test_final.shape
 
 
-# In[118]:
+# In[158]:
 
 
-test_final.to_csv("test_final.csv")
+test_final.to_csv("test_final_100k.csv")
 
 
-# In[116]:
+# In[159]:
 
 
 display(train.fecha_dato.max())
@@ -464,17 +464,11 @@ train = train[train.fecha_dato<train_fdm] #not yet!
 display(train.fecha_dato.max())
 
 
-# In[120]:
+# In[160]:
 
 
 
-train.to_csv("train_final.csv")
-
-
-# In[ ]:
-
-
-
+train.to_csv("train_final_100k.csv")
 
 
 # In[ ]:
@@ -483,7 +477,13 @@ train.to_csv("train_final.csv")
 
 
 
-# In[157]:
+# In[ ]:
+
+
+
+
+
+# In[162]:
 
 
 display(len(test_public_data))
