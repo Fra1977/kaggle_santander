@@ -73,6 +73,12 @@ display(train.shape)
 display(train.fecha_dato.max())
 
 
+# In[163]:
+
+
+
+
+
 # # Modified find target: add last date
 
 # In[129]:
@@ -327,18 +333,18 @@ df_subm
 df_subm.to_csv("submission_100k.csv", index=False)
 
 
-# In[148]:
+# In[169]:
 
 
-df_subm.iloc[:10]
+df_subm[df_subm.Expected!=""]
 
 
-# In[149]:
+# In[170]:
 
 
 sample = df_subm.copy()
 sample.columns=["Id", "Predicted"]
-sample["Predicted"] = df_subm.Expected[6]
+sample["Predicted"] = df_subm.Expected[68]
 display(sample.head(4))
 sample.to_csv("submission_sample_FR_100k.csv", index=False)
 
@@ -471,10 +477,10 @@ display(train.fecha_dato.max())
 train.to_csv("train_final_100k.csv")
 
 
-# In[ ]:
+# In[164]:
 
 
-
+test_final.head()
 
 
 # In[ ]:
