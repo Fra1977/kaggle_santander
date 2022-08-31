@@ -1,19 +1,31 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[2]:
+
+
+get_ipython().system('pwd')
+
+
+# In[3]:
 
 
 from init import *
 
 
-# In[2]:
+# In[4]:
 
 
 pd.options.display.max_columns
 
 
-# In[121]:
+# In[20]:
+
+
+pd.options.display.max_rows=550
+
+
+# In[5]:
 
 
 get_ipython().run_line_magic('time', 'train = pd.read_csv("train_ver2.csv")')
@@ -115,11 +127,7 @@ def df2target(df,uid):
 #for uid in list(test_public_uid)[101:111]:
 #test_public_data.append(df2target(test, uid))# , test.fecha_dato.max()))
 #%lprun df2target(test, uid)
-def testrun():
-    test_public_data = []
-    for uid in list(test_public_uid)[101:131]:
-        test_public_data.append(df2target(test, uid))# , test.fecha_dato.max()))
-get_ipython().run_line_magic('prun', '-s cumulative  -l 10 testrun()')
+Çª%prun -s cumulative  -l 10 testrun()        
 
 
 # In[ ]:
@@ -339,6 +347,18 @@ df_subm.to_csv("submission_100k.csv", index=False)
 df_subm[df_subm.Expected!=""]
 
 
+# In[181]:
+
+
+from matplotlib import pyplot as pp
+
+
+# In[183]:
+
+
+df_subm[df_subm.Expected!=""].Expected.value_counts()#.plot(kind='bar')
+
+
 # In[170]:
 
 
@@ -483,10 +503,10 @@ train.to_csv("train_final_100k.csv")
 test_final.head()
 
 
-# In[ ]:
+# In[189]:
 
 
-
+test_final.info()
 
 
 # In[162]:
@@ -515,6 +535,26 @@ pd.read_csv("test_public_data_soln.csv", infer=5000)
 #    dfid = dfid.iloc[-1:,:]#.reset_index()
 #    a=dfid[dfid >0].stack()
 #    display(a)
+
+
+# In[186]:
+
+
+train.shape
+
+
+# In[187]:
+
+
+train.info()
+
+
+# In[188]:
+
+
+#train.to_parquet("train_final_100k.parquet")
+
+# cean up data, reduce samplle size. 
 
 
 # # Split Train / Test Set
@@ -596,6 +636,118 @@ display(test_uid.issubset(train_uid))
 
 
 
+
+
+# In[ ]:
+
+
+
+
+
+# # Recode files to parquet
+
+# In[ ]:
+
+
+get_ipython().system('')
+
+
+# In[8]:
+
+
+train_100k = pd.read_csv("train_final_100k.csv")
+
+
+# In[13]:
+
+
+train_100k.head(3)
+
+
+# In[15]:
+
+
+get_ipython().system('pip install pyarrow')
+
+
+# In[26]:
+
+
+def reage(val):
+    try: 
+        return float(val)
+    except Exception:
+        return np.nan
+
+
+# In[27]:
+
+
+#train_100k.age.value_counts()
+train_100k["age"] = train_100k.age.apply(lambda x: reage(x) )
+
+
+# In[31]:
+
+
+#train_100k.antiguedad.value_counts()
+train_100k["antiguedad"] = train_100k.antiguedad.apply(lambda x: reage(x) )
+
+
+# In[34]:
+
+
+def reind(val):
+    try: 
+        return str(int(val))
+    except Exception:
+        try: 
+            return str(val)
+        except Exception:
+            return("NAN")
+
+
+# In[35]:
+
+
+#train_100k.indrel_1mes.value_counts()
+train_100k["indrel_1mes"] = train_100k.indrel_1mes.apply(lambda x: reind(x) )
+
+
+# In[36]:
+
+
+train_100k.to_parquet("train_final_100k.parquet", compression="gzip", engine="pyarrow")
+
+
+# In[37]:
+
+
+train_10k = pd.read_csv("train_final.csv")
+train_10k["age"] = train_10k.age.apply(lambda x: reage(x) )
+train_10k["antiguedad"] = train_10k.antiguedad.apply(lambda x: reage(x) )
+train_10k["indrel_1mes"] = train_10k.indrel_1mes.apply(lambda x: reage(x) )
+train_10k.to_parquet("train_final_100k.parquet", compression="gzip", engine="pyarrow")
+
+
+# In[38]:
+
+
+test_10k = pd.read_csv("test_final.csv")
+test_10k["age"] = test_10k.age.apply(lambda x: reage(x) )
+test_10k["antiguedad"] = test_10k.antiguedad.apply(lambda x: reage(x) )
+test_10k["indrel_1mes"] = test_10k.indrel_1mes.apply(lambda x: reage(x) )
+test_10k.to_parquet("test_final_10k.parquet", compression="gzip", engine="pyarrow")
+
+
+# In[39]:
+
+
+test_10k = pd.read_csv("test_final_100k.csv")
+test_10k["age"] = test_10k.age.apply(lambda x: reage(x) )
+test_10k["antiguedad"] = test_10k.antiguedad.apply(lambda x: reage(x) )
+test_10k["indrel_1mes"] = test_10k.indrel_1mes.apply(lambda x: reage(x) )
+test_10k.to_parquet("test_final_10k.parquet", compression="gzip", engine="pyarrow")
 
 
 # # Remove target columsn from test set 
